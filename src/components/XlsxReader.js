@@ -2,7 +2,7 @@ import React from 'react';
 import * as XLSX from 'xlsx';
 
 
-function XlsxReader({onDataRead}) {
+function XlsxReader({ onDataRead }) {
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
     const reader = new FileReader();
@@ -16,15 +16,15 @@ function XlsxReader({onDataRead}) {
     };
 
     reader.onerror = (e) => {
+      onDataRead && onDataRead(null)
       console.error('文件读取错误：', e.target.error);
     };
-
     reader.readAsArrayBuffer(file);
   };
 
   return (
     <div>
-      <input type="file" onChange={handleFileSelect} />
+      <input type="file"  accept=".xls,.xlsx" onChange={handleFileSelect} />
     </div>
   );
 }
