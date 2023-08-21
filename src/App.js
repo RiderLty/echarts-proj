@@ -26,7 +26,7 @@ const num2ym = (monthsDiff) => {
   );
   const targetYear = targetDate.getFullYear();
   const targetMonth = targetDate.getMonth() + 1;
-  return `${targetYear}.${targetMonth}`;
+  return `${targetYear}年${targetMonth}月`;
 };
 
 const absData2offset = (list) => {
@@ -42,8 +42,16 @@ const absData2offset = (list) => {
 
 
 const rawData = [
-  ["1966.12", "2016.01", "2019.06", "2020.01", "2022.01","2035.6"],
+  ["1966.12", "2016.01", "2019.06", "2020.01", "2022.01","2035.8"],
   ["1967.06", "2015.03", "2019.12", "2021.04",],
+  ["1966.12", "2016.01", "2019.06", "2020.01", "2022.01","2035.8"],
+  ["1967.06", "2015.03", "2019.12", "2021.04",],
+  ["1966.12", "2016.01", "2019.06", "2020.01", "2022.01","2035.8"],
+  ["1967.06", "2015.03", "2019.12", "2021.04",],
+  ["1966.12", "2016.01", "2019.06", "2020.01", "2022.01","2035.8"],
+  ["1967.06", "2015.03", "2019.12", "2021.04",],
+  ["1966.12", "2016.01", "2019.06", "2020.01", "2022.01","2035.8"],
+
 ]
 
 const mkData = (raw) => {
@@ -57,11 +65,12 @@ const mkSeries = (data) => {
   const fillZero = data.map(row => row.length >= maxLen ? row : [...row, ...Array(maxLen - row.length).fill(0)])
   const transposeData = fillZero[0].map((_, colIndex) => fillZero.map(row => row[colIndex]))
   return transposeData.map((row,index) => ({
-    name: 'Life Cost',
+    name: `bar${index}`,
     type: 'bar',
     stackStrategy: "all",
     stack: 'one',
-    color: index === 0 ? "#FFFFFF00" : getRandomColor(),
+    emphasis: emphasisStyle,
+    color: index === 0 ? "#FFFFFF00" : '',
     data: row
   }))
 }
@@ -75,39 +84,65 @@ function getRandomColor() {
   return color;
 }
 
+const emphasisStyle = {
+  itemStyle: {
+    shadowBlur: 10,
+    shadowColor: 'rgba(0,0,0,0.3)'
+  }
+};
 function App() {
   return <div style={{ width: "100vw", height: "100vh" }}>
     <EchartsRender
       options={{
         title: {
-          text: '年限统计',
-          subtext: '滁州市财政局'
+          text: '主标题',
+          subtext: '副标题'
         },
         tooltip: {
-          trigger: 'axis',
-          axisPointer: {
-            type: 'shadow'
-          },
-          formatter: (params) => {
-            const tar = params[1];
-            return tar.name + '<br/>' + tar.seriesName + ' : ' + tar.value;
+          // trigger: 'axis',
+          // axisPointer: {
+          //   type: 'shadow'
+          // },
+          // formatter: (params) => {
+          //   const tar = params[1];
+          //   return tar.name + '<br/>' + tar.seriesName + ' : ' + tar.value;
+          // }
+        },
+        legend: {
+          data: ['bar', 'bar2', 'bar3', 'bar4'],
+          left: '10%'
+        },
+        brush: {
+          toolbox: ['rect', 'polygon', 'lineX', 'lineY', 'keep', 'clear'],
+          xAxisIndex: 0
+        },
+        toolbox: {
+          feature: {
+            magicType: {
+              type: ['stack']
+            },
+            dataView: {}
           }
         },
         grid: {
+          // top:"16%",
           left: '3%',
-          right: '4%',
-          bottom: '3%',
+          right: '3%',
+          bottom: '5%',
           containLabel: true
         },
         xAxis: {
           type: 'category',
+          // splitLine: { show: false },
+          data: ['张三', '李四','张三', '李四','张三', '李四','张三', '李四','张三'],
+          axisLine: { onZero: true },
           splitLine: { show: false },
-          data: ['张三', '李四']
+          splitArea: { show: false },
         },
         yAxis: {
           type: 'value',
           axisLabel: {
-            formatter: (val) => num2ym(val)+"年" // 应用自定义的格式化函数
+            formatter: (val) => num2ym(val)// 应用自定义的格式化函数
           }
         },
         series:mkSeries(mkData(rawData))
