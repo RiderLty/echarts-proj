@@ -4,6 +4,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import React, { useEffect, useMemo, useState } from 'react';
 import './App.css';
 import EchartsRender from './components/EchartsRender';
+import XlsxReader from './components/XlsxReader';
 
 
 const ym2num = (dateString) => {//输入形如 1994.8  2023.7 返回距离当前日期的月数
@@ -42,15 +43,15 @@ const absData2offset = (list) => {
 
 
 const rawData = [
-  [ "2016.01", "2019.06", "2020.01", "2022.01","2026.8"],
-  [ "2015.03", "2019.12", "2021.04",],
-  [ "2016.01", "2019.06", "2020.01", "2022.01","2026.8"],
-  [ "2015.03", "2019.12", "2021.04",],
-  [ "2016.01", "2019.06", "2020.01", "2022.01","2026.8"],
-  [ "2015.03", "2019.12", "2021.04",],
-  [ "2016.01", "2019.06", "2020.01", "2022.01","2026.8"],
-  [ "2015.03", "2019.12", "2021.04",],
-  [ "2016.01", "2019.06", "2020.01", "2022.01","2026.8"],
+  ["2016.01", "2019.06", "2020.01", "2022.01", "2026.8"],
+  ["2015.03", "2019.12", "2021.04",],
+  ["2016.01", "2019.06", "2020.01", "2022.01", "2026.8"],
+  ["2015.03", "2019.12", "2021.04",],
+  ["2016.01", "2019.06", "2020.01", "2022.01", "2026.8"],
+  ["2015.03", "2019.12", "2021.04",],
+  ["2016.01", "2019.06", "2020.01", "2022.01", "2026.8"],
+  ["2015.03", "2019.12", "2021.04",],
+  ["2016.01", "2019.06", "2020.01", "2022.01", "2026.8"],
 
 ]
 
@@ -64,7 +65,7 @@ const mkSeries = (data) => {
   const maxLen = Math.max(...data.map(subArray => subArray.length))
   const fillZero = data.map(row => row.length >= maxLen ? row : [...row, ...Array(maxLen - row.length).fill(0)])
   const transposeData = fillZero[0].map((_, colIndex) => fillZero.map(row => row[colIndex]))
-  return transposeData.map((row,index) => ({
+  return transposeData.map((row, index) => ({
     name: `bar${index}`,
     type: 'bar',
     stackStrategy: "all",
@@ -91,22 +92,35 @@ const emphasisStyle = {
   }
 };
 function App() {
+
+  const [chartData,setChartData] = useState(null)
+  const [chartOptions,setChartOptions] = useState({})
+  const handelDataChange = (data) => {
+    setChartData(data)
+  }
+
+
+
+
   return <div style={{ width: "100vw", height: "100vh" }}>
-    <EchartsRender
+    <XlsxReader
+      onDataRead={handelDataChange}
+    />
+    {
+      chartData && <EchartsRender
       options={{
         title: {
           text: '主标题',
           subtext: '副标题'
         },
         tooltip: {
-          // trigger: 'axis',
-          // axisPointer: {
-          //   type: 'shadow'
-          // },
-          // formatter: (params) => {
-          //   const tar = params[1];
-          //   return tar.name + '<br/>' + tar.seriesName + ' : ' + tar.value;
-          // }
+          trigger: 'item',
+          axisPointer: {
+            type: 'shadow'
+          },
+          formatter: (params) => {
+            return JSON.stringify(params,null,4)
+          }
         },
         legend: {
           data: ['bar', 'bar2', 'bar3', 'bar4'],
@@ -133,8 +147,8 @@ function App() {
         },
         xAxis: {
           type: 'category',
-          // splitLine: { show: false },
-          data: ['张三', '李四','张三', '李四','张三', '李四','张三', '李四','张三'],
+          splitLine: { show: false },
+          data: ['张三', '李四', '张三', '李四', '张三', '李四', '张三', '李四', '张三'],
           axisLine: { onZero: true },
           splitLine: { show: false },
           splitArea: { show: false },
@@ -144,15 +158,16 @@ function App() {
           axisLabel: {
             formatter: (val) => num2ym(val)// 应用自定义的格式化函数
           },
-          interval:12,
+          interval: 12,
         },
-        series:mkSeries(mkData(rawData))
+        series: mkSeries(mkData(rawData))
       }}
       style={{
         with: "100%",
         height: "100%"
       }}
     />
+    }
   </div>
 }
 
